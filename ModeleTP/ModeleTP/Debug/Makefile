@@ -125,62 +125,55 @@ ADDITIONAL_DEPENDENCIES:=
 
 OUTPUT_FILE_DEP:= ./makedep.mk
 
-LIB_DEP+=  \
-//jaizkibel/cti/pdibon/Downloads/ModeleTP/bibliotheque\ pour\ TPs/libRobot.a \
-//jaizkibel/cti/pdibon/Downloads/ModeleTP/bibliotheque\ pour\ TPs/libTPsIUT.a
+LIB_DEP+= 
 
 LINKER_SCRIPT_DEP+=  \
 ../src/ASF/sam/utils/linker_scripts/sam3x/sam3x8/gcc/flash.ld
 
 
 # AVR32/GNU C Compiler
-
-
-
-
-
-
-
-
-
-
-
-
-
-src/ASF/common/utils/interrupt/%.o: ../src/ASF/common/utils/interrupt/%.c
+src/ASF/common/utils/interrupt/interrupt_sam_nvic.o: ../src/ASF/common/utils/interrupt/interrupt_sam_nvic.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 5.3.1
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG -DBOARD=ARDUINO_DUE_X -Dscanf=iscanf -DARM_MATH_CM3=true -Dprintf=iprintf -D__SAM3X8E__  -I"../common/applications/user_application/sam3x8e_arduino_due_x/config" -I"../src/ASF/sam/utils/cmsis/sam3x/include" -I"../src/config" -I"../src/ASF/thirdparty/CMSIS/Lib/GCC" -I"../src/ASF/common/utils" -I"../src" -I"../src/ASF/sam/utils" -I"../src/ASF/sam/utils/preprocessor" -I"../src/ASF/sam/boards" -I"../src/ASF/common/boards" -I"../src/ASF/sam/boards/arduino_due_x" -I"../src/ASF/sam/utils/header_files" -I"../src/ASF/sam/utils/cmsis/sam3x/source/templates" -I"../src/ASF/thirdparty/CMSIS/Include"  -O1 -fdata-sections -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
-src/ASF/sam/utils/cmsis/sam3x/source/templates/%.o: ../src/ASF/sam/utils/cmsis/sam3x/source/templates/%.c
+src/ASF/sam/utils/cmsis/sam3x/source/templates/exceptions.o: ../src/ASF/sam/utils/cmsis/sam3x/source/templates/exceptions.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 5.3.1
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG -DBOARD=ARDUINO_DUE_X -Dscanf=iscanf -DARM_MATH_CM3=true -Dprintf=iprintf -D__SAM3X8E__  -I"../common/applications/user_application/sam3x8e_arduino_due_x/config" -I"../src/ASF/sam/utils/cmsis/sam3x/include" -I"../src/config" -I"../src/ASF/thirdparty/CMSIS/Lib/GCC" -I"../src/ASF/common/utils" -I"../src" -I"../src/ASF/sam/utils" -I"../src/ASF/sam/utils/preprocessor" -I"../src/ASF/sam/boards" -I"../src/ASF/common/boards" -I"../src/ASF/sam/boards/arduino_due_x" -I"../src/ASF/sam/utils/header_files" -I"../src/ASF/sam/utils/cmsis/sam3x/source/templates" -I"../src/ASF/thirdparty/CMSIS/Include"  -O1 -fdata-sections -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
-src/ASF/sam/utils/cmsis/sam3x/source/templates/gcc/%.o: ../src/ASF/sam/utils/cmsis/sam3x/source/templates/gcc/%.c
+src/ASF/sam/utils/cmsis/sam3x/source/templates/gcc/startup_sam3x.o: ../src/ASF/sam/utils/cmsis/sam3x/source/templates/gcc/startup_sam3x.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 5.3.1
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG -DBOARD=ARDUINO_DUE_X -Dscanf=iscanf -DARM_MATH_CM3=true -Dprintf=iprintf -D__SAM3X8E__  -I"../common/applications/user_application/sam3x8e_arduino_due_x/config" -I"../src/ASF/sam/utils/cmsis/sam3x/include" -I"../src/config" -I"../src/ASF/thirdparty/CMSIS/Lib/GCC" -I"../src/ASF/common/utils" -I"../src" -I"../src/ASF/sam/utils" -I"../src/ASF/sam/utils/preprocessor" -I"../src/ASF/sam/boards" -I"../src/ASF/common/boards" -I"../src/ASF/sam/boards/arduino_due_x" -I"../src/ASF/sam/utils/header_files" -I"../src/ASF/sam/utils/cmsis/sam3x/source/templates" -I"../src/ASF/thirdparty/CMSIS/Include"  -O1 -fdata-sections -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
-src/ASF/sam/utils/syscalls/gcc/%.o: ../src/ASF/sam/utils/syscalls/gcc/%.c
+src/ASF/sam/utils/cmsis/sam3x/source/templates/system_sam3x.o: ../src/ASF/sam/utils/cmsis/sam3x/source/templates/system_sam3x.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 5.3.1
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG -DBOARD=ARDUINO_DUE_X -Dscanf=iscanf -DARM_MATH_CM3=true -Dprintf=iprintf -D__SAM3X8E__  -I"../common/applications/user_application/sam3x8e_arduino_due_x/config" -I"../src/ASF/sam/utils/cmsis/sam3x/include" -I"../src/config" -I"../src/ASF/thirdparty/CMSIS/Lib/GCC" -I"../src/ASF/common/utils" -I"../src" -I"../src/ASF/sam/utils" -I"../src/ASF/sam/utils/preprocessor" -I"../src/ASF/sam/boards" -I"../src/ASF/common/boards" -I"../src/ASF/sam/boards/arduino_due_x" -I"../src/ASF/sam/utils/header_files" -I"../src/ASF/sam/utils/cmsis/sam3x/source/templates" -I"../src/ASF/thirdparty/CMSIS/Include"  -O1 -fdata-sections -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
-src/%.o: ../src/%.c
+src/ASF/sam/utils/syscalls/gcc/syscalls.o: ../src/ASF/sam/utils/syscalls/gcc/syscalls.c
 	@echo Building file: $<
-	@echo Invoking: ARM/GNU C Compiler : 5.3.1
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG -DBOARD=ARDUINO_DUE_X -Dscanf=iscanf -DARM_MATH_CM3=true -Dprintf=iprintf -D__SAM3X8E__  -I"../common/applications/user_application/sam3x8e_arduino_due_x/config" -I"../src/ASF/sam/utils/cmsis/sam3x/include" -I"../src/config" -I"../src/ASF/thirdparty/CMSIS/Lib/GCC" -I"../src/ASF/common/utils" -I"../src" -I"../src/ASF/sam/utils" -I"../src/ASF/sam/utils/preprocessor" -I"../src/ASF/sam/boards" -I"../src/ASF/common/boards" -I"../src/ASF/sam/boards/arduino_due_x" -I"../src/ASF/sam/utils/header_files" -I"../src/ASF/sam/utils/cmsis/sam3x/source/templates" -I"../src/ASF/thirdparty/CMSIS/Include"  -O1 -fdata-sections -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
+
+src/main.o: ../src/main.c
+	@echo Building file: $<
+	@echo Invoking: ARM/GNU C Compiler : 6.3.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE)  -x c -mthumb -D__SAM3X8E__ -DDEBUG -DBOARD=ARDUINO_DUE_X -Dscanf=iscanf -DARM_MATH_CM3=true -Dprintf=iprintf -D__SAM3X8E__  -I"../common/applications/user_application/sam3x8e_arduino_due_x/config" -I"../src/ASF/sam/utils/cmsis/sam3x/include" -I"../src/config" -I"../src/ASF/thirdparty/CMSIS/Lib/GCC" -I"../src/ASF/common/utils" -I"../src" -I"../src/ASF/sam/utils" -I"../src/ASF/sam/utils/preprocessor" -I"../src/ASF/sam/boards" -I"../src/ASF/common/boards" -I"../src/ASF/sam/boards/arduino_due_x" -I"../src/ASF/sam/utils/header_files" -I"../src/ASF/sam/utils/cmsis/sam3x/source/templates" -I"../src/ASF/thirdparty/CMSIS/Include"  -O1 -fdata-sections -ffunction-sections -mlong-calls -g3 -Wall -mcpu=cortex-m3 -c -pipe -fno-strict-aliasing -Wall -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -std=gnu99 -ffunction-sections -fdata-sections -Wchar-subscripts -Wcomment -Wformat=2 -Wimplicit-int -Wmain -Wparentheses -Wsequence-point -Wreturn-type -Wswitch -Wtrigraphs -Wunused -Wuninitialized -Wunknown-pragmas -Wfloat-equal -Wundef -Wshadow -Wbad-function-cast -Wwrite-strings -Wsign-compare -Waggregate-return  -Wmissing-declarations -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations -Wpacked -Wredundant-decls -Wnested-externs -Wlong-long -Wunreachable-code -Wcast-align --param max-inline-insns-single=500 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
 
 
 
@@ -206,7 +199,7 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER_SCRIPT_DEP)
 	@echo Building target: $@
-	@echo Invoking: ARM/GNU Linker : 5.3.1
+	@echo Invoking: ARM/GNU Linker : 6.3.1
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-gcc.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -mthumb -Wl,-Map="ModeleTP.map" -Wl,--start-group -larm_cortexM3l_math -lm -lRobot -lTPsIUT  -Wl,--end-group -L"../src/ASF/thirdparty/CMSIS/Lib/GCC" -L"../.." -L"../../bibliotheque pour TPs" -L"\\jaizkibel\cti\pdibon\Downloads\ModeleTP\bibliotheque pour TPs"  -Wl,--gc-sections -mcpu=cortex-m3 --specs=nano.specs -lc -u _printf_float -Wl,--entry=Reset_Handler -Wl,--cref -mthumb -T../src/ASF/sam/utils/linker_scripts/sam3x/sam3x8/gcc/flash.ld  
 	@echo Finished building target: $@
 	"C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\arm\arm-gnu-toolchain\bin\arm-none-eabi-objcopy.exe" -O binary "ModeleTP.elf" "ModeleTP.bin"
