@@ -10,6 +10,7 @@
 #define TIMER_RESET Timer0
 
 void resetMot();
+void resetMoteurLent();
 
 void init(){
 	initCarte();
@@ -32,7 +33,7 @@ void init(){
 	
 	allumerPeriph(TIMER_RESET);
 	timerModeDelai(TIMER_RESET,HDIV2, 42000000UL, NON_REPETITIF, INC);
-	autoriserITTimer(TIMER_RESET, LIMITE, 0, resetMot);
+	autoriserITTimer(TIMER_RESET, LIMITE, 0, resetMoteurLent);
 }
 
 float positionnerMoteurLent(int moteur, float angle, float prevAngle){
@@ -55,14 +56,39 @@ float positionnerMoteurLent(int moteur, float angle, float prevAngle){
 
 int indicePos[] = {0, 0, 0, 0, 0};
 float prevAngle[] = {0, 0, 0, 0, 0};
-int isInter = 0;	
+int isInterrompu = 0;	
 
 void resetMot(){
 	for (int i = 0; i < 5; i++){
 		prevAngle[i] = positionnerMoteurLent(i, 0, prevAngle[i]);
 		indicePos[i] = 0;
 	}
-	isInter = 1;
+	isInterrompu = 1;
+}
+
+void resetMoteurLent(){
+	lancerTimer(TIMER);
+	int done = 0;
+	do{
+		done = 0;
+		for(int i = 0; i < 5; i++){
+			if(prevAngle[i] < 0){
+				prevAngle[i]+=1;
+				positionnerMoteur(i, prevAngle[i]);
+			}
+			else if(prevAngle[i] > 0){
+				prevAngle[i]-=1;
+				positionnerMoteur(i, prevAngle[i]);
+			}
+			else{
+				indicePos[i] = 0;
+				done ++;
+			}
+		}
+		while (!(testerEtatTimer(TIMER, LIMITE)));
+	}while(done<5);
+	arreterTimer(TIMER);
+	isInterrompu = 1;
 }
 
 int main (void) {
@@ -72,30 +98,29 @@ int main (void) {
 	int portsDel[] = {PortC, PortA, PortB};
 	int indiceMot = 0;
 	/// TP2 : 
-	
 	//while (1){
 		//if(lireLigne(PortB, BP1)){
 			//lancerTimer(TIMER_RESET);
 			//while(lireLigne(PortB, BP1));
 			//arreterTimer(TIMER_RESET);
-			//if (!isInter){
+			//if (!isInterrompu){
 				//prevAngle[0] = positionnerMoteurLent(BASE, posision[indicePos[0]], prevAngle[0]);
 				//indicePos[0] = (indicePos[0]+1)%4;
 				//while(lireLigne(PortB, BP1));
 			//}
-			//isInter = 0;
+			//isInterrompu = 0;
 		//}
 	//}
 	
 	/// TP1 et 2 : 
-	while(true) {
+	while(1) {
 		if(lireLigne(PortB, BP1)){
 			lancerTimer(TIMER_RESET);
 			while(lireLigne(PortB, BP1));
 			arreterTimer(TIMER_RESET);
-			if (!isInter) {
+			if (!isInterrompu) {
 				if(indiceMot == 5){
-					resetMot();
+					resetMoteurLent();
 				}
 				else{
 					printf("BP1 appuié\n");
@@ -103,7 +128,7 @@ int main (void) {
 					indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
 				}
 			}
-			isInter = 0;
+			isInterrompu = 0;
 		}
 		if(lireLigne(PortC, BP2)){
 			printf("BP2 appuié\n");
