@@ -38,10 +38,13 @@ void init(){
 	autoriserITTimer(TIMER_RESET, LIMITE, 0, resetMoteurLent);
 	
 	allumerPeriph(ConvAN);
-	initConvAN(25, RES10BITS);
+	initConvAN(10, RES10BITS);
 	programmerLigne(PortA, 24, ENTREE);
+	programmerLigne(PortA, 23, ENTREE);
+	programmerLigne(PortA, 23, ENTREE);
+	programmerLigne(PortA, 6, ENTREE);
+	programmerLigne(PortA, 5, ENTREE);
 	declenchementConvAN(TIMER);
-	choisirEntreeConvAN(6);
 }
 
 float positionnerMoteurLent(int moteur, float angle, float prevAngle){
@@ -79,7 +82,6 @@ void resetMot(){
 }
 
 void resetMoteurLent(){
-	lancerTimer(TIMER);
 	int done = 0;
 	do{
 		done = 0;
@@ -99,7 +101,6 @@ void resetMoteurLent(){
 		}
 		while (!(testerEtatTimer(TIMER, LIMITE)));
 	}while(done<5);
-	arreterTimer(TIMER);
 	isInterrompu = 1;
 }
 
@@ -110,6 +111,7 @@ int main (void) {
 	int portsDel[] = {PortC, PortA, PortB};
 	int indiceMot = 0;
 	int mes = 0;
+	int cANs[] = {FIN_CONV2, FIN_CONV3, FIN_CONV4, FIN_CONV5, FIN_CONV6};
 	lancerTimer(TIMER);
 	/// TP2 petit:
 	//while (1){
@@ -167,10 +169,13 @@ int main (void) {
 			}
 			while(lireLigne(PortC,BP2));
 		}
-		if (testerEtatConvAN(FIN_CONV6)){
-			mes = lireValeurConvAN(6);
-			prevAngle[PINCE] = ((mes*180)/1023)-90;
-			positionnerMoteur(PINCE, ((mes*180)/1023)-90);
+		for (int i = 0; i < 5; i++){
+			choisirEntreeConvAN(i+2);
+			if (testerEtatConvAN(cANs[i])){
+				mes = lireValeurConvAN(i+2);
+				printf("%d\n", mes);
+				prevAngle[i] = positionnerMoteurLent(i, ((mes*180)/1023)-90, prevAngle[i]);
+			}
 		}
 	}
 	
