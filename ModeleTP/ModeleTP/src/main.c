@@ -79,7 +79,6 @@ void resetMot(){
 
 void resetMoteurLent(){
 	lancerTimer(TIMER);
-	printf("on reset les moteurs : %d", lireMesureTimer(TIMER_RESET) > );
 	int done = 0;
 	do{
 		done = 0;
@@ -104,9 +103,8 @@ void resetMoteurLent(){
 }
 
 void bougerMoteurs(){
-	printf("%d\n", lireMesureTimer(TIMER_RESET));
 	if (!isInterrompu) {
-		if(indiceMot == 5){
+		if((indiceMot == 5) || (lireMesureTimer(TIMER_RESET) > 42000000UL)){
 			resetMoteurLent();
 		}
 		else{
