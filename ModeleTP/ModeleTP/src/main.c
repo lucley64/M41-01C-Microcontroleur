@@ -120,59 +120,59 @@ int main (void) {
 	//}
 	
 	/// TP1 et 2 : 
-	//while(1) {
-		//if(lireLigne(PortB, BP1)){
-			//lancerTimer(TIMER_RESET);
-			//while(lireLigne(PortB, BP1));
-			//arreterTimer(TIMER_RESET);
-			//if (!isInterrompu) {
-				//if(indiceMot == 5){
-					//resetMoteurLent();
-				//}
-				//else{
-					//printf("BP1 appuié\n");
-					//prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
-					//indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
-				//}
-			//}
-			//isInterrompu = 0;
-		//}
-		//if(lireLigne(PortC, BP2)){
-			//printf("BP2 appuié\n");
-			//indiceMot = (indiceMot+1)%6;
-			//int indiceMotToBin = indiceMot;
-			//if (indiceMot != 5){
-				//for(int i = 0; i < 3; i++){
-					//int bin = !(indiceMotToBin%2);
-					//printf("%d", !bin);
-					//if (del[i] == DEL_DROITE){
-						//bin = !bin;
-					//}
-					//ecrireLigne(portsDel[i], del[i], bin);
-					//indiceMotToBin /= 2;
-				//}
-				//printf("\n");
-			//}
-			//else{
-				//ecrireLigne(PortC, DEL_GAUCHE, 0);
-				//ecrireLigne(PortA, DEL_MILLIEU, 0);
-				//ecrireLigne(PortB, DEL_DROITE, 1);
-			//}
-			//while(lireLigne(PortC,BP2));
-		//}
-	//}
+	while(1) {
+		if(lireLigne(PortB, BP1)){
+			lancerTimer(TIMER_RESET);
+			while(lireLigne(PortB, BP1));
+			arreterTimer(TIMER_RESET);
+			if (!isInterrompu) {
+				if(indiceMot == 5){
+					resetMoteurLent();
+				}
+				else{
+					printf("BP1 appuié\n");
+					prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
+					indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
+				}
+			}
+			isInterrompu = 0;
+		}
+		if(lireLigne(PortC, BP2)){
+			printf("BP2 appuié\n");
+			indiceMot = (indiceMot+1)%6;
+			int indiceMotToBin = indiceMot;
+			if (indiceMot != 5){
+				for(int i = 0; i < 3; i++){
+					int bin = !(indiceMotToBin%2);
+					printf("%d", !bin);
+					if (del[i] == DEL_DROITE){
+						bin = !bin;
+					}
+					ecrireLigne(portsDel[i], del[i], bin);
+					indiceMotToBin /= 2;
+				}
+				printf("\n");
+			}
+			else{
+				ecrireLigne(PortC, DEL_GAUCHE, 0);
+				ecrireLigne(PortA, DEL_MILLIEU, 0);
+				ecrireLigne(PortB, DEL_DROITE, 1);
+			}
+			while(lireLigne(PortC,BP2));
+		}
+	}
 	
 	
 	// Test
-	double mes = 0;
-	lancerConversionAN();
-	while(1){
-		while(!testerEtatConvAN(FIN_CONV6));
-		lancerTimer(TIMER);
-		mes = lireValeurConvAN(6);
-		mes = ((mes/1023)*180)-90;
-		printf("%d\n", mes);
-		while(!testerEtatTimer(TIMER, LIMITE));
-		arreterTimer(TIMER);
-	}
+	//int mes = 0;
+	//int prevAngle = 0;
+	//lancerConversionAN();
+	//while(1){
+		//while(!testerEtatConvAN(FIN_CONV6));
+		//lancerTimer(TIMER);
+		//mes = lireValeurConvAN(6);
+		//positionnerMoteur(PINCE, ((mes*180)/1023)-90);
+		//while(!testerEtatTimer(TIMER, LIMITE));
+		//arreterTimer(TIMER);
+	//}
 }
