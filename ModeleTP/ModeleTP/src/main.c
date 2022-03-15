@@ -31,6 +31,7 @@ void init(){
 	
 	allumerPeriph(TIMER);
 	timerModeDelai(TIMER, HDIV2, 1680000UL, REPETITIF, INC);
+	timerModeDeclenchement(TIMER, HDIV2, 1680000UL, REPETITIF);
 	
 	allumerPeriph(TIMER_RESET);
 	timerModeDelai(TIMER_RESET,HDIV2, 42000000UL, NON_REPETITIF, INC);
@@ -39,26 +40,30 @@ void init(){
 	allumerPeriph(ConvAN);
 	initConvAN(25, RES10BITS);
 	programmerLigne(PortA, 24, ENTREE);
-	declenchementConvAN(PROG_CONTINU);
+	declenchementConvAN(TIMER);
 	choisirEntreeConvAN(6);
 }
 
 float positionnerMoteurLent(int moteur, float angle, float prevAngle){
-	lancerTimer(TIMER);
-	if (angle > prevAngle){
-		for (int i = prevAngle; i < angle; i++){
-			positionnerMoteur(moteur, i);
-			while (!(testerEtatTimer(TIMER, LIMITE)));
-		}
+	if (!(angle < -90 || angle > 90)){
+			if (angle > prevAngle){
+				for (int i = prevAngle; i < angle; i++){
+					positionnerMoteur(moteur, i);
+					while (!(testerEtatTimer(TIMER, LIMITE)));
+				}
+			}
+			else{
+				for (int i = prevAngle; i > angle; i--){
+					positionnerMoteur(moteur, i);
+					while (!(testerEtatTimer(TIMER, LIMITE)));
+				}
+			}
+		return angle;
 	}
 	else{
-		for (int i = prevAngle; i > angle; i--){
-			positionnerMoteur(moteur, i);
-			while (!(testerEtatTimer(TIMER, LIMITE)));
-		}
+		printf("NOPE\n");
+		return prevAngle;
 	}
-	arreterTimer(TIMER);
-	return angle;
 }
 
 int indicePos[] = {0, 0, 0, 0, 0};
@@ -104,7 +109,9 @@ int main (void) {
 	int del[] = {DEL_GAUCHE, DEL_MILLIEU, DEL_DROITE};
 	int portsDel[] = {PortC, PortA, PortB};
 	int indiceMot = 0;
-	/// TP2 petit: 
+	int mes = 0;
+	lancerTimer(TIMER);
+	/// TP2 petit:
 	//while (1){
 		//if(lireLigne(PortB, BP1)){
 			//lancerTimer(TIMER_RESET);
@@ -159,6 +166,11 @@ int main (void) {
 				ecrireLigne(PortB, DEL_DROITE, 1);
 			}
 			while(lireLigne(PortC,BP2));
+		}
+		if (testerEtatConvAN(FIN_CONV6)){
+			mes = lireValeurConvAN(6);
+			prevAngle[PINCE] = ((mes*180)/1023)-90;
+			positionnerMoteur(PINCE, ((mes*180)/1023)-90);
 		}
 	}
 	
