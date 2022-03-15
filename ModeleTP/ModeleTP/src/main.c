@@ -33,7 +33,8 @@ void init(){
 	timerModeDelai(TIMER, HDIV2, 1680000UL, REPETITIF, INC);
 	
 	allumerPeriph(TIMER_RESET);
-	timerModeDelai(TIMER_RESET,HDIV2, 42000000UL, NON_REPETITIF, INC);
+	timerModeMesure(TIMER_RESET,HDIV2, 42000000UL, DE_1_A_0);
+	programmerLigne(PortB, BP1, FONCTIONB);
 	autoriserITTimer(TIMER_RESET, LIMITE, 0, resetMoteurLent);
 	
 	allumerPeriph(ConvAN);
@@ -63,14 +64,12 @@ float positionnerMoteurLent(int moteur, float angle, float prevAngle){
 
 int indicePos[] = {0, 0, 0, 0, 0};
 float prevAngle[] = {0, 0, 0, 0, 0};
-int isInterrompu = 0;	
 
 void resetMot(){
 	for (int i = 0; i < 5; i++){
 		prevAngle[i] = positionnerMoteurLent(i, 0, prevAngle[i]);
 		indicePos[i] = 0;
 	}
-	isInterrompu = 1;
 }
 
 void resetMoteurLent(){
@@ -95,15 +94,15 @@ void resetMoteurLent(){
 		while (!(testerEtatTimer(TIMER, LIMITE)));
 	}while(done<5);
 	arreterTimer(TIMER);
-	isInterrompu = 1;
 }
 
 int main (void) {
 	init();
-	int posision[] = {30, 0, -30, 0};
+	int posision[] = {10, 0, -10, 0};
 	int del[] = {DEL_GAUCHE, DEL_MILLIEU, DEL_DROITE};
 	int portsDel[] = {PortC, PortA, PortB};
 	int indiceMot = 0;
+	lancerTimer(TIMER_RESET);
 	/// TP2 petit: 
 	//while (1){
 		//if(lireLigne(PortB, BP1)){
@@ -121,21 +120,15 @@ int main (void) {
 	
 	/// TP1 et 2 : 
 	while(1) {
-		if(lireLigne(PortB, BP1)){
-			lancerTimer(TIMER_RESET);
-			while(lireLigne(PortB, BP1));
-			arreterTimer(TIMER_RESET);
-			if (!isInterrompu) {
-				if(indiceMot == 5){
-					resetMoteurLent();
-				}
-				else{
-					printf("BP1 appuié\n");
-					prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
-					indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
-				}
+		if(testerEtatTimer(TIMER_RESET, MESURE)){
+			if(indiceMot == 5){
+				resetMoteurLent();
 			}
-			isInterrompu = 0;
+			else{
+				printf("BP1 appuié\n");
+				prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
+				indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
+			}
 		}
 		if(lireLigne(PortC, BP2)){
 			printf("BP2 appuié\n");
