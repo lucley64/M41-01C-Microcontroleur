@@ -21,9 +21,6 @@ void init(){
 	allumerPeriph(PortA);
 	allumerPeriph(PortB);
 	allumerPeriph(PortC);
-	activerFiltrageLigne(PortB, BP1, 40);
-	programmerLigne(PortB, BP1, ENTREE);
-	activerFiltrageLigne(PortB, BP1, 40);
 	programmerLigne(PortC, BP2, ENTREE);
 	activerFiltrageLigne(PortC, BP2, 40);
 	programmerLigne(PortA, DEL_MILLIEU, SORTIE1);
@@ -34,8 +31,9 @@ void init(){
 	timerModeDelai(TIMER, HDIV2, 1680000UL, REPETITIF, INC);
 	
 	allumerPeriph(TIMER_RESET);
+	activerFiltrageLigne(PortB, BP1, 40);
 	programmerLigne(PortB, BP1, FONCTIONB);
-	timerModeMesure(TIMER_RESET,HDIV2, LIMITE_TIMER_MAX, DE_1_A_0);
+	timerModeMesure(TIMER_RESET, HDIV2, LIMITE_TIMER_MAX, DE_1_A_0);
 	autoriserITTimer(TIMER_RESET, MESURE, 0, bougerMoteurs);
 	
 	allumerPeriph(ConvAN);
@@ -81,7 +79,7 @@ void resetMot(){
 
 void resetMoteurLent(){
 	lancerTimer(TIMER);
-	printf("on reset les moteurs : %d", lireMesureTimer(TIMER_RESET));
+	printf("on reset les moteurs : %d", lireMesureTimer(TIMER_RESET) > );
 	int done = 0;
 	do{
 		done = 0;
@@ -106,18 +104,20 @@ void resetMoteurLent(){
 }
 
 void bougerMoteurs(){
-	//if (!isInterrompu) {
-		//if(indiceMot == 5){
-			//resetMoteurLent();
-		//}
-		//else{
-			//printf("BP1 appuié\n");
-			//prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
-			//indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
-		//}
-	//}
-	//isInterrompu = 0;
+	printf("%d\n", lireMesureTimer(TIMER_RESET));
+	if (!isInterrompu) {
+		if(indiceMot == 5){
+			resetMoteurLent();
+		}
+		else{
+			printf("BP1 appuié\n");
+			prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
+			indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
+		}
+	}
+	isInterrompu = 0;
 	printf("on Bouge les moteurs \n");
+	lancerTimer(TIMER_RESET);
 }
 
 int main (void) {
@@ -138,6 +138,7 @@ int main (void) {
 	//}
 	
 	/// TP1 et 2 : 
+	lancerTimer(TIMER_RESET);
 	while(1) {
 		if(lireLigne(PortC, BP2)){
 			printf("BP2 appuié\n");
