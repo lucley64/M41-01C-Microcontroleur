@@ -9,6 +9,7 @@
 #define TIMER Timer1
 #define TIMER_RESET Timer0
 #define BOUT_ROT 24
+#define TIMER_MOTEURS Timer2
 
 void resetMot();
 void resetMoteurLent();
@@ -33,14 +34,17 @@ void init(){
 	timerModeDelai(TIMER, HDIV2, 1680000UL, REPETITIF, INC);
 	timerModeDeclenchement(TIMER, HDIV2, 1680000UL, REPETITIF);
 	
+	//allumerPeriph(TIMER_MOTEURS);
+	//timerModeDelai(TIMER_MOTEURS, HDIV2, LIMITE_TIMER_MAX, REPETITIF, INC);
+	
 	allumerPeriph(TIMER_RESET);
 	timerModeDelai(TIMER_RESET,HDIV2, 42000000UL, NON_REPETITIF, INC);
 	autoriserITTimer(TIMER_RESET, LIMITE, 0, resetMoteurLent);
 	
 	allumerPeriph(ConvAN);
-	initConvAN(10, RES10BITS);
-	programmerLigne(PortA, 24, ENTREE);
-	programmerLigne(PortA, 23, ENTREE);
+	initConvAN(10, RES12BITS);
+	programmerLigne(PortA, BOUT_ROT, ENTREE);
+	programmerLigne(PortA, 22, ENTREE);
 	programmerLigne(PortA, 23, ENTREE);
 	programmerLigne(PortA, 6, ENTREE);
 	programmerLigne(PortA, 5, ENTREE);
@@ -48,7 +52,7 @@ void init(){
 }
 
 float positionnerMoteurLent(int moteur, float angle, float prevAngle){
-	if (!(angle < -90 || angle > 90)){
+	if (!(angle < -45 || angle > 45)){
 			if (angle > prevAngle){
 				for (int i = prevAngle; i < angle; i++){
 					positionnerMoteur(moteur, i);
@@ -104,6 +108,12 @@ void resetMoteurLent(){
 	isInterrompu = 1;
 }
 
+int bougerMoteurAvecVitesse(int vitesse, int moteur, int angleActuel){
+	int angle = angleActuel + vitesse;
+	int nouvAngle = positionnerMoteurLent(moteur, angle, angleActuel);
+	return nouvAngle;
+}
+
 int main (void) {
 	init();
 	int posision[] = {30, 0, -30, 0};
@@ -112,6 +122,8 @@ int main (void) {
 	int indiceMot = 0;
 	int mes = 0;
 	int cANs[] = {FIN_CONV2, FIN_CONV3, FIN_CONV4, FIN_CONV5, FIN_CONV6};
+	int indiceCAN = 0;
+	choisirEntreeConvAN(indiceCAN+2);
 	lancerTimer(TIMER);
 	/// TP2 petit:
 	//while (1){
@@ -146,7 +158,7 @@ int main (void) {
 			}
 			isInterrompu = 0;
 		}
-		if(lireLigne(PortC, BP2)){
+		else if(lireLigne(PortC, BP2)){
 			printf("BP2 appuié\n");
 			indiceMot = (indiceMot+1)%6;
 			int indiceMotToBin = indiceMot;
@@ -169,13 +181,20 @@ int main (void) {
 			}
 			while(lireLigne(PortC,BP2));
 		}
-		for (int i = 0; i < 5; i++){
-			choisirEntreeConvAN(i+2);
-			if (testerEtatConvAN(cANs[i])){
-				mes = lireValeurConvAN(i+2);
-				printf("%d\n", mes);
-				prevAngle[i] = positionnerMoteurLent(i, ((mes*180)/1023)-90, prevAngle[i]);
+		if (testerEtatConvAN(cANs[indiceCAN])){
+			mes = lireValeurConvAN(indiceCAN+2);
+			printf("CAN num %d %d : %d\n",indiceCAN, mes, (((mes/10)*90)/409)-45);
+			if (indiceCAN == 4)
+			{
+				prevAngle[indiceCAN] = positionnerMoteurLent(indiceCAN, (((mes/10)*90)/409)-45, prevAngle[indiceCAN]);
+			} 
+			else
+			{
+				prevAngle[indiceCAN] = bougerMoteurAvecVitesse((((mes/10)*20)/409)-10, indiceCAN, prevAngle[indiceCAN]);
 			}
+			lancerTimer(TIMER);
+			indiceCAN = (indiceCAN+1)%5;
+			choisirEntreeConvAN(indiceCAN+2);
 		}
 	}
 	
