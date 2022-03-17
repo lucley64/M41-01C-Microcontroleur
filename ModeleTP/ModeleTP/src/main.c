@@ -31,11 +31,10 @@ void init(){
 	programmerLigne(PortC, DEL_GAUCHE, SORTIE1);
 	
 	allumerPeriph(TIMER);
-	timerModeDelai(TIMER, HDIV2, 1680000UL, REPETITIF, INC);
-	timerModeDeclenchement(TIMER, HDIV2, 1680000UL, REPETITIF);
+	timerModeDeclenchement(TIMER, HDIV2, 420000UL, REPETITIF);
 	
-	//allumerPeriph(TIMER_MOTEURS);
-	//timerModeDelai(TIMER_MOTEURS, HDIV2, LIMITE_TIMER_MAX, REPETITIF, INC);
+	allumerPeriph(TIMER_MOTEURS);
+	timerModeDelai(TIMER_MOTEURS, HDIV2, 1680000UL, REPETITIF, INC);
 	
 	allumerPeriph(TIMER_RESET);
 	timerModeDelai(TIMER_RESET,HDIV2, 42000000UL, NON_REPETITIF, INC);
@@ -52,19 +51,21 @@ void init(){
 }
 
 float positionnerMoteurLent(int moteur, float angle, float prevAngle){
-	if (!(angle < -45 || angle > 45)){
+	if (!(angle < -90 || angle > 90)){
+		lancerTimer(TIMER_MOTEURS);
 			if (angle > prevAngle){
 				for (int i = prevAngle; i < angle; i++){
 					positionnerMoteur(moteur, i);
-					while (!(testerEtatTimer(TIMER, LIMITE)));
+					while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 				}
 			}
 			else{
 				for (int i = prevAngle; i > angle; i--){
 					positionnerMoteur(moteur, i);
-					while (!(testerEtatTimer(TIMER, LIMITE)));
+					while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 				}
 			}
+		arreterTimer(TIMER_MOTEURS);
 		return angle;
 	}
 	else{
@@ -87,7 +88,8 @@ void resetMot(){
 
 void resetMoteurLent(){
 	int done = 0;
-	do{
+		lancerTimer(TIMER_MOTEURS);
+		do{
 		done = 0;
 		for(int i = 0; i < 5; i++){
 			if(prevAngle[i] < 0){
@@ -103,12 +105,16 @@ void resetMoteurLent(){
 				done ++;
 			}
 		}
-		while (!(testerEtatTimer(TIMER, LIMITE)));
+		while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 	}while(done<5);
-	isInterrompu = 1;
+		arreterTimer(TIMER_MOTEURS);
+		isInterrompu = 1;
 }
 
 int bougerMoteurAvecVitesse(int vitesse, int moteur, int angleActuel){
+	unsigned long int longVitesse = ((vitesse+10)*160000)/20;
+	printf("%d\n", longVitesse);
+	//timerModeDelai(TIMER_MOTEURS, HDIV2, 1680000UL, REPETITIF, INC);
 	int angle = angleActuel + vitesse;
 	int nouvAngle = positionnerMoteurLent(moteur, angle, angleActuel);
 	return nouvAngle;
@@ -123,8 +129,10 @@ int main (void) {
 	int mes = 0;
 	int cANs[] = {FIN_CONV2, FIN_CONV3, FIN_CONV4, FIN_CONV5, FIN_CONV6};
 	int indiceCAN = 0;
+	int correctionEntree[] = {0, 1, 1, 0, 0};
 	choisirEntreeConvAN(indiceCAN+2);
 	lancerTimer(TIMER);
+	lancerConversionAN();
 	/// TP2 petit:
 	//while (1){
 		//if(lireLigne(PortB, BP1)){
@@ -183,14 +191,14 @@ int main (void) {
 		}
 		if (testerEtatConvAN(cANs[indiceCAN])){
 			mes = lireValeurConvAN(indiceCAN+2);
-			printf("CAN num %d %d : %d\n",indiceCAN, mes, (((mes/10)*90)/409)-45);
+			printf("CAN num %d %d : %d\n",indiceCAN, mes, ((((mes/10)*20)/409)-10)+correctionEntree[indiceCAN]);
 			if (indiceCAN == 4)
 			{
-				prevAngle[indiceCAN] = positionnerMoteurLent(indiceCAN, (((mes/10)*90)/409)-45, prevAngle[indiceCAN]);
+				prevAngle[indiceCAN] = positionnerMoteurLent(indiceCAN, ((((mes/10)*90)/409)-45), prevAngle[indiceCAN]);
 			} 
 			else
 			{
-				prevAngle[indiceCAN] = bougerMoteurAvecVitesse((((mes/10)*20)/409)-10, indiceCAN, prevAngle[indiceCAN]);
+				prevAngle[indiceCAN] = bougerMoteurAvecVitesse(((((mes/10)*20)/409)-10)+correctionEntree[indiceCAN], indiceCAN, prevAngle[indiceCAN]);
 			}
 			lancerTimer(TIMER);
 			indiceCAN = (indiceCAN+1)%5;
