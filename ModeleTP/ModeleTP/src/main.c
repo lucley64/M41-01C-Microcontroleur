@@ -112,11 +112,13 @@ void resetMoteurLent(){
 }
 
 int bougerMoteurAvecVitesse(int vitesse, int moteur, int angleActuel){
-	unsigned long int longVitesse = ((vitesse+10)*160000)/20;
-	printf("%d\n", longVitesse);
-	//timerModeDelai(TIMER_MOTEURS, HDIV2, 1680000UL, REPETITIF, INC);
+	unsigned long longVitesse = ((vitesse)*160000)/10;
+	printf("%ul\n", longVitesse);
+	//modifierLimiteTimer(TIMER_MOTEURS, longVitesse);
+	//printf("ah");
 	int angle = angleActuel + vitesse;
 	int nouvAngle = positionnerMoteurLent(moteur, angle, angleActuel);
+	//modifierLimiteTimer(TIMER_MOTEURS, 1680000UL);
 	return nouvAngle;
 }
 
