@@ -45,7 +45,6 @@ void positionnerMoteurMoi(int moteur, float angle){
 		angle >= -90 && angle <= 90){
 		Peripherique genSig[] = {PILOTE_BASE, PILOTE_EPAULE, PILOTE_COUDE, PILOTE_POIGNET, PILOTE_PINCE};
 		uint16_t seuil = (((((angle + 90.0) * 1800.0) / 180.0) + 600.0) * 21.0) / 8.0;
-		printf("seuil : %u \n", seuil);
 		modifierSeuilGeneSignal(genSig[moteur], seuil);
 	} 
 	else{
@@ -147,8 +146,8 @@ void resetMoteurLent(){
 		}
 		while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 	}while(done<5);
-		arreterTimer(TIMER_MOTEURS);
-		isInterrompu = 1;
+	arreterTimer(TIMER_MOTEURS);
+	isInterrompu = 1;
 }
 
 int bougerMoteurAvecVitesse(int vitesse, int moteur, int angleActuel){
@@ -164,10 +163,11 @@ int bougerMoteurAvecVitesse(int vitesse, int moteur, int angleActuel){
 
 int main (void) {
 	init();
-	int posision[] = {30, 0, -30, 0};
+	float posisions[3][5] = {{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}};
 	int del[] = {DEL_GAUCHE, DEL_MILLIEU, DEL_DROITE};
 	int portsDel[] = {PortC, PortA, PortB};
 	int indiceMot = 0;
+	int indicePosMem = 0;
 	int mes = 0;
 	int cANs[] = {FIN_CONV2, FIN_CONV3, FIN_CONV4, FIN_CONV5, FIN_CONV6};
 	int indiceCAN = 0;
@@ -175,61 +175,44 @@ int main (void) {
 	choisirEntreeConvAN(indiceCAN+2);
 	lancerTimer(TIMER);
 	lancerConversionAN();
-	/// TP2 petit:
-	//while (1){
-		//if(lireLigne(PortB, BP1)){
-			//lancerTimer(TIMER_RESET);
-			//while(lireLigne(PortB, BP1));
-			//arreterTimer(TIMER_RESET);
-			//if (!isInterrompu){
-				//prevAngle[0] = positionnerMoteurLent(BASE, posision[indicePos[0]], prevAngle[0]);
-				//indicePos[0] = (indicePos[0]+1)%4;
-				//while(lireLigne(PortB, BP1));
-			//}
-			//isInterrompu = 0;
-		//}
-	//}
-	
-	/// TP1 et 2 : 
 	while(1) {
 		if(lireLigne(PortB, BP1)){
-			lancerTimer(TIMER_RESET);
-			while(lireLigne(PortB, BP1));
-			arreterTimer(TIMER_RESET);
-			if (!isInterrompu) {
-				if(indiceMot == 5){
-					resetMoteurLent();
-				}
-				else{
-					printf("BP1 appuié\n");
-					prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot], 1);
-					indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
-				}
+			for (int i = 0; i < 5; i++){
+				posisions[indicePosMem][i] = prevAngle[i];
 			}
-			isInterrompu = 0;
+			indicePosMem = (indicePosMem+1)%3;
+			while(lireLigne(PortB, BP1));
 		}
 		else if(lireLigne(PortC, BP2)){
-			printf("BP2 appuié\n");
-			indiceMot = (indiceMot+1)%6;
-			int indiceMotToBin = indiceMot;
-			if (indiceMot != 5){
-				for(int i = 0; i < 3; i++){
-					int bin = !(indiceMotToBin%2);
-					printf("%d", !bin);
-					if (del[i] == DEL_DROITE){
-						bin = !bin;
+			printf("reset moteurs\n");
+			resetMoteurLent();
+			indicePosMem = 0;
+			while(!lireLigne(PortC, BP2)){
+				printf("lancerTimer\n");
+				lancerTimer(TIMER_MOTEURS);
+				int done = 0;
+				while(done < 5){
+					printf("percourMoteurs\n");
+					for(int i = 0; i < 5; i++){
+						printf("moteur : %i\n", i);
+						if(posisions[indicePosMem][i] < prevAngle[i]){
+							prevAngle[i] --;
+							printf("position du mot a : %f\n", prevAngle[i]);
+							positionnerMoteurMoi(i, prevAngle[i]);
+						} else if (posisions[indicePosMem][i] > prevAngle[i]){
+							prevAngle[i] ++;
+							printf("position du mot a : %f\n", prevAngle[i]);
+							positionnerMoteurMoi(i, prevAngle[i]);
+						} else{
+							done++;
+							printf("%i moteurs ont fini\n", done);
+						}
 					}
-					ecrireLigne(portsDel[i], del[i], bin);
-					indiceMotToBin /= 2;
+					while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 				}
-				printf("\n");
+				indicePosMem = (indicePosMem+1)%3;
+				arreterTimer(TIMER_MOTEURS);
 			}
-			else{
-				ecrireLigne(PortC, DEL_GAUCHE, 0);
-				ecrireLigne(PortA, DEL_MILLIEU, 0);
-				ecrireLigne(PortB, DEL_DROITE, 1);
-			}
-			while(lireLigne(PortC,BP2));
 		}
 		if (testerEtatConvAN(cANs[indiceCAN])){
 			mes = lireValeurConvAN(indiceCAN+2);
@@ -247,18 +230,4 @@ int main (void) {
 			choisirEntreeConvAN(indiceCAN+2);
 		}
 	}
-	
-	
-	// Test
-	//int mes = 0;
-	//int prevAngle = 0;
-	//lancerConversionAN();
-	//while(1){
-		//while(!testerEtatConvAN(FIN_CONV6));
-		//lancerTimer(TIMER);
-		//mes = lireValeurConvAN(6);
-		//positionnerMoteurMoi(PINCE, ((mes*180)/1023)-90);
-		//while(!testerEtatTimer(TIMER, LIMITE));
-		//arreterTimer(TIMER);
-	//}
 }
