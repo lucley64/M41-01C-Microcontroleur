@@ -50,21 +50,22 @@ void init(){
 	declenchementConvAN(TIMER);
 }
 
-float positionnerMoteurLent(int moteur, float angle, float prevAngle){
+float positionnerMoteurLent(int moteur, float angle, float prevAngle, int vitesse){
 	if (!(angle < -90 || angle > 90)){
 		lancerTimer(TIMER_MOTEURS);
-			if (angle > prevAngle){
-				for (int i = prevAngle; i < angle; i++){
-					positionnerMoteur(moteur, i);
-					while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
-				}
+		if (angle > prevAngle){
+			for (int i = prevAngle; i < angle; i+=vitesse){
+				positionnerMoteur(moteur, i);
+				while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 			}
-			else{
-				for (int i = prevAngle; i > angle; i--){
-					positionnerMoteur(moteur, i);
-					while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
-				}
+		}
+		else{
+			for (int i = prevAngle; i > angle; i-=vitesse){
+				positionnerMoteur(moteur, i);
+				while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 			}
+		}
+		positionnerMoteur(moteur, angle);
 		arreterTimer(TIMER_MOTEURS);
 		return angle;
 	}
@@ -80,7 +81,7 @@ int isInterrompu = 0;
 
 void resetMot(){
 	for (int i = 0; i < 5; i++){
-		prevAngle[i] = positionnerMoteurLent(i, 0, prevAngle[i]);
+		prevAngle[i] = positionnerMoteurLent(i, 0, prevAngle[i], 1);
 		indicePos[i] = 0;
 	}
 	isInterrompu = 1;
@@ -112,13 +113,13 @@ void resetMoteurLent(){
 }
 
 int bougerMoteurAvecVitesse(int vitesse, int moteur, int angleActuel){
-	unsigned long longVitesse = ((vitesse)*160000)/10;
-	printf("%ul\n", longVitesse);
-	//modifierLimiteTimer(TIMER_MOTEURS, longVitesse);
-	//printf("ah");
+	int longVitesse = vitesse;
+	if (longVitesse < 0){
+		longVitesse = -1*longVitesse;
+	}
+	printf("vitesse : %i\n", longVitesse);
 	int angle = angleActuel + vitesse;
-	int nouvAngle = positionnerMoteurLent(moteur, angle, angleActuel);
-	//modifierLimiteTimer(TIMER_MOTEURS, 1680000UL);
+	int nouvAngle = positionnerMoteurLent(moteur, angle, angleActuel, longVitesse);
 	return nouvAngle;
 }
 
@@ -162,7 +163,7 @@ int main (void) {
 				}
 				else{
 					printf("BP1 appuié\n");
-					prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot]);
+					prevAngle[indiceMot] = positionnerMoteurLent(indiceMot, posision[indicePos[indiceMot]], prevAngle[indiceMot], 1);
 					indicePos[indiceMot] = (indicePos[indiceMot]+1)%4;
 				}
 			}
@@ -196,7 +197,7 @@ int main (void) {
 			printf("CAN num %d %d : %d\n",indiceCAN, mes, ((((mes/10)*20)/409)-10)+correctionEntree[indiceCAN]);
 			if (indiceCAN == 4)
 			{
-				prevAngle[indiceCAN] = positionnerMoteurLent(indiceCAN, ((((mes/10)*90)/409)-45), prevAngle[indiceCAN]);
+				prevAngle[indiceCAN] = positionnerMoteurLent(indiceCAN, ((((mes/10)*90)/409)-45), prevAngle[indiceCAN], 1);
 			} 
 			else
 			{
