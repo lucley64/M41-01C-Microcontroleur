@@ -14,10 +14,42 @@
 void resetMot();
 void resetMoteurLent();
 
+void initRobotMoi(){
+	allumerPeriph(PILOTE_BASE);
+	allumerPeriph(PILOTE_EPAULE);
+	allumerPeriph(PILOTE_COUDE);
+	allumerPeriph(PILOTE_POIGNET);
+	allumerPeriph(PILOTE_PINCE);
+	
+	initGeneSignal(PILOTE_BASE, DIV32, 52500UL, 3938UL, INVERSE);
+	initGeneSignal(PILOTE_EPAULE, DIV32, 52500UL, 3938UL, INVERSE);
+	initGeneSignal(PILOTE_COUDE, DIV32, 52500UL, 3938UL, INVERSE);
+	initGeneSignal(PILOTE_POIGNET, DIV32, 52500UL, 3938UL, INVERSE);
+	initGeneSignal(PILOTE_PINCE, DIV32, 52500UL, 3938UL, INVERSE);
+	
+	allumerPeriph(PORT_BASE);
+	allumerPeriph(PORT_EPAULE);
+	allumerPeriph(PORT_COUDE);
+	allumerPeriph(PORT_POIGNET);
+	allumerPeriph(PORT_PINCE);
+	
+	programmerLigne(PORT_BASE, LIGNE_BASE, FONCTIONB);
+	programmerLigne(PORT_EPAULE, LIGNE_EPAULE, FONCTIONB);
+	programmerLigne(PORT_COUDE, LIGNE_COUDE, FONCTIONB);
+	programmerLigne(PORT_POIGNET, LIGNE_POIGNET, FONCTIONB);
+	programmerLigne(PORT_PINCE, LIGNE_PINCE, FONCTIONB);
+}
+
+void positionnerMoteurMoi(int moteur, float angle){
+	Peripherique genSig[] = {PILOTE_BASE, PILOTE_EPAULE, PILOTE_COUDE, PILOTE_POIGNET, PILOTE_PINCE};
+	uint16_t seuil = (((((uint16_t)angle+90)*1800)/180)+600)/(8/21);
+	modifierSeuilGeneSignal(genSig[moteur], seuil);
+}
+
 void init(){
 	initCarte();
 	configureConsole();
-	initRobot();
+	initRobotMoi();
 	allumerPeriph(PortA);
 	allumerPeriph(PortB);
 	allumerPeriph(PortC);
