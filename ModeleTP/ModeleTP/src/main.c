@@ -41,9 +41,16 @@ void initRobotMoi(){
 }
 
 void positionnerMoteurMoi(int moteur, float angle){
-	Peripherique genSig[] = {PILOTE_BASE, PILOTE_EPAULE, PILOTE_COUDE, PILOTE_POIGNET, PILOTE_PINCE};
-	uint16_t seuil = (((((uint16_t)angle+90)*1800)/180)+600)/(8/21);
-	modifierSeuilGeneSignal(genSig[moteur], seuil);
+	if (moteur >= 0 && moteur <= 4 &&
+		angle >= -90 && angle <= 90){
+		Peripherique genSig[] = {PILOTE_BASE, PILOTE_EPAULE, PILOTE_COUDE, PILOTE_POIGNET, PILOTE_PINCE};
+		uint16_t seuil = (((((angle + 90.0) * 1800.0) / 180.0) + 600.0) * 21.0) / 8.0;
+		printf("seuil : %u \n", seuil);
+		modifierSeuilGeneSignal(genSig[moteur], seuil);
+	} 
+	else{
+		printf("NOPE \n");
+	}
 }
 
 void init(){
@@ -87,17 +94,17 @@ float positionnerMoteurLent(int moteur, float angle, float prevAngle, int vitess
 		lancerTimer(TIMER_MOTEURS);
 		if (angle > prevAngle){
 			for (int i = prevAngle; i < angle; i+=vitesse){
-				positionnerMoteur(moteur, i);
+				positionnerMoteurMoi(moteur, i);
 				while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 			}
 		}
 		else{
 			for (int i = prevAngle; i > angle; i-=vitesse){
-				positionnerMoteur(moteur, i);
+				positionnerMoteurMoi(moteur, i);
 				while (!(testerEtatTimer(TIMER_MOTEURS, LIMITE)));
 			}
 		}
-		positionnerMoteur(moteur, angle);
+		positionnerMoteurMoi(moteur, angle);
 		arreterTimer(TIMER_MOTEURS);
 		return angle;
 	}
@@ -127,11 +134,11 @@ void resetMoteurLent(){
 		for(int i = 0; i < 5; i++){
 			if(prevAngle[i] < 0){
 				prevAngle[i]+=1;
-				positionnerMoteur(i, prevAngle[i]);
+				positionnerMoteurMoi(i, prevAngle[i]);
 			}
 			else if(prevAngle[i] > 0){
 				prevAngle[i]-=1;
-				positionnerMoteur(i, prevAngle[i]);
+				positionnerMoteurMoi(i, prevAngle[i]);
 			}
 			else{
 				indicePos[i] = 0;
@@ -250,7 +257,7 @@ int main (void) {
 		//while(!testerEtatConvAN(FIN_CONV6));
 		//lancerTimer(TIMER);
 		//mes = lireValeurConvAN(6);
-		//positionnerMoteur(PINCE, ((mes*180)/1023)-90);
+		//positionnerMoteurMoi(PINCE, ((mes*180)/1023)-90);
 		//while(!testerEtatTimer(TIMER, LIMITE));
 		//arreterTimer(TIMER);
 	//}
